@@ -180,7 +180,7 @@ describe('LoginPage', () => {
       await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
-        expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
+        expect(screen.getByText(/Invalid credentials/)).toBeInTheDocument()
       })
     })
 
@@ -233,15 +233,48 @@ describe('LoginPage', () => {
       await user.click(screen.getByRole('button', { name: /log in/i }))
 
       await waitFor(() => {
-        expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
+        expect(screen.getByText(/Invalid credentials/)).toBeInTheDocument()
       })
 
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       await user.click(screen.getByRole('button', { name: /log in/i }))
 
       await waitFor(() => {
-        expect(screen.queryByText('Invalid credentials')).not.toBeInTheDocument()
+        expect(screen.queryByText(/Invalid credentials/)).not.toBeInTheDocument()
       })
+    })
+  })
+
+  // ── F: Navigation Links ──────────────────────────────────────────────────────
+
+  describe('F — Navigation Links', () => {
+    it('F1: renders a "Forgot password?" link', () => {
+      render(<LoginPage />)
+      const link = screen.getByRole('link', { name: /forgot password/i })
+      expect(link).toBeInTheDocument()
+    })
+
+    it('F2: "Forgot password?" link has an href attribute', () => {
+      render(<LoginPage />)
+      const link = screen.getByRole('link', { name: /forgot password/i })
+      expect(link).toHaveAttribute('href')
+    })
+
+    it('F3: renders a "Sign up" link', () => {
+      render(<LoginPage />)
+      const link = screen.getByRole('link', { name: /sign up/i })
+      expect(link).toBeInTheDocument()
+    })
+
+    it('F4: "Sign up" link has an href attribute', () => {
+      render(<LoginPage />)
+      const link = screen.getByRole('link', { name: /sign up/i })
+      expect(link).toHaveAttribute('href')
+    })
+
+    it('F5: "Don\'t have an account?" prompt is visible alongside the Sign up link', () => {
+      render(<LoginPage />)
+      expect(screen.getByText(/don't have an account/i)).toBeInTheDocument()
     })
   })
 })
