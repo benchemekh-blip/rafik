@@ -15,6 +15,7 @@ function renderPage() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<div>home-sentinel</div>} />
+        <Route path="/forgot-password" element={<div>forgot-sentinel</div>} />
       </Routes>
     </MemoryRouter>
   )
@@ -266,10 +267,10 @@ describe('LoginPage', () => {
       expect(link).toBeInTheDocument()
     })
 
-    it('F2: "Forgot password?" link has an href attribute', () => {
+    it('F2: "Forgot password?" link points to /forgot-password', () => {
       renderPage()
       const link = screen.getByRole('link', { name: /forgot password/i })
-      expect(link).toHaveAttribute('href')
+      expect(link).toHaveAttribute('href', '/forgot-password')
     })
 
     it('F3: renders a "Sign up" link', () => {
