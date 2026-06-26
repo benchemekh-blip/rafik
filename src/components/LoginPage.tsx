@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/auth'
 import styles from './LoginPage.module.css'
 
@@ -30,6 +30,7 @@ function validate(email: string, password: string): FormErrors {
 }
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -52,7 +53,7 @@ export default function LoginPage() {
 
     try {
       await loginUser(email.trim(), password)
-      setStatus('success')
+      navigate('/home')
     } catch (err) {
       setStatus('error')
       setApiError(err instanceof Error ? err.message : 'Login failed')
@@ -114,12 +115,6 @@ export default function LoginPage() {
           {status === 'error' && (
             <div role="alert" className={styles.alertError}>
               ⚠ {apiError}
-            </div>
-          )}
-
-          {status === 'success' && (
-            <div role="status" className={styles.alertSuccess}>
-              ✓ Login successful! Welcome back.
             </div>
           )}
 

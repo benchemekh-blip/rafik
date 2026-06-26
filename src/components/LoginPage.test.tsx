@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import LoginPage from './LoginPage'
@@ -11,8 +11,11 @@ const mockLoginUser = vi.mocked(authModule.loginUser)
 
 function renderPage() {
   return render(
-    <MemoryRouter>
-      <LoginPage />
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<div>home-sentinel</div>} />
+      </Routes>
     </MemoryRouter>
   )
 }
@@ -169,7 +172,7 @@ describe('LoginPage', () => {
       })
     })
 
-    it('D3: shows success message on resolved API response', async () => {
+    it('D3: navigates to /home after successful login', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       renderPage()
@@ -177,7 +180,7 @@ describe('LoginPage', () => {
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
-        expect(screen.getByRole('status')).toBeInTheDocument()
+        expect(screen.getByText('home-sentinel')).toBeInTheDocument()
       })
     })
 
@@ -193,15 +196,15 @@ describe('LoginPage', () => {
       })
     })
 
-    it('D5: re-enables submit button after API call resolves', async () => {
+    it('D5: re-enables submit button after API call fails', async () => {
       const user = userEvent.setup()
-      mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
+      mockLoginUser.mockRejectedValueOnce(new Error('Invalid credentials'))
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
-      await user.type(screen.getByLabelText(/password/i), 'password123')
+      await user.type(screen.getByLabelText(/email/i), 'wrong@example.com')
+      await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
-        expect(screen.getByRole('button')).not.toBeDisabled()
+        expect(screen.getByRole('button', { name: /log in/i })).not.toBeDisabled()
       })
     })
 
