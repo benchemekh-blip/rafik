@@ -15,6 +15,7 @@ function renderPage() {
       <Routes>
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/" element={<div>login-sentinel</div>} />
+        <Route path="/reset-password" element={<div>reset-sentinel</div>} />
       </Routes>
     </MemoryRouter>
   )
@@ -80,7 +81,7 @@ describe('ForgotPasswordPage', () => {
   describe('C — Submission & API Integration', () => {
     it('C1: calls forgotPassword with the trimmed email on valid submit', async () => {
       const user = userEvent.setup()
-      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent' })
+      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent', resetToken: 'mock-reset-token-abc123' })
       renderPage()
       await user.type(screen.getByLabelText(/email address/i), '  benchemekh@gmail.com  ')
       await user.click(screen.getByRole('button', { name: /send reset link/i }))
@@ -103,7 +104,7 @@ describe('ForgotPasswordPage', () => {
 
     it('C3: shows success message after API resolves', async () => {
       const user = userEvent.setup()
-      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent' })
+      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent', resetToken: 'mock-reset-token-abc123' })
       renderPage()
       await user.type(screen.getByLabelText(/email address/i), 'benchemekh@gmail.com')
       await user.click(screen.getByRole('button', { name: /send reset link/i }))
@@ -113,14 +114,15 @@ describe('ForgotPasswordPage', () => {
       })
     })
 
-    it('C4: shows the submitted email in the success message', async () => {
+    it('C4: shows the submitted email and demo reset link in the success screen', async () => {
       const user = userEvent.setup()
-      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent' })
+      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent', resetToken: 'mock-reset-token-abc123' })
       renderPage()
       await user.type(screen.getByLabelText(/email address/i), 'benchemekh@gmail.com')
       await user.click(screen.getByRole('button', { name: /send reset link/i }))
       await waitFor(() => {
         expect(screen.getByText(/benchemekh@gmail\.com/)).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: /reset-password/i })).toBeInTheDocument()
       })
     })
 
@@ -144,6 +146,17 @@ describe('ForgotPasswordPage', () => {
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /send reset link/i })).not.toBeDisabled()
       })
+    })
+
+    it('C7: clicking the demo reset link navigates to /reset-password', async () => {
+      const user = userEvent.setup()
+      mockForgotPassword.mockResolvedValueOnce({ message: 'Password reset link sent', resetToken: 'mock-reset-token-abc123' })
+      renderPage()
+      await user.type(screen.getByLabelText(/email address/i), 'benchemekh@gmail.com')
+      await user.click(screen.getByRole('button', { name: /send reset link/i }))
+      await waitFor(() => screen.getByRole('link', { name: /reset-password/i }))
+      await user.click(screen.getByRole('link', { name: /reset-password/i }))
+      expect(screen.getByText('reset-sentinel')).toBeInTheDocument()
     })
   })
 

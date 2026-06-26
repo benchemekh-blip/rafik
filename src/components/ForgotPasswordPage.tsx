@@ -10,6 +10,7 @@ export default function ForgotPasswordPage() {
   const [emailError, setEmailError] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [apiError, setApiError] = useState('')
+  const [resetToken, setResetToken] = useState('')
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -29,7 +30,8 @@ export default function ForgotPasswordPage() {
     setStatus('loading')
 
     try {
-      await forgotPassword(trimmed)
+      const res = await forgotPassword(trimmed)
+      setResetToken(res.resetToken)
       setStatus('success')
     } catch (err) {
       setStatus('error')
@@ -57,6 +59,15 @@ export default function ForgotPasswordPage() {
               We sent a password reset link to <strong>{email.trim()}</strong>.
               It may take a few minutes to arrive.
             </p>
+            <div className={styles.demoBox}>
+              <p className={styles.demoLabel}>Demo only — click the link below to reset your password:</p>
+              <Link
+                to={`/reset-password?token=${resetToken}`}
+                className={styles.demoLink}
+              >
+                /reset-password?token={resetToken}
+              </Link>
+            </div>
             <Link to="/" className={styles.backButton}>Back to Log In</Link>
           </div>
         ) : (
