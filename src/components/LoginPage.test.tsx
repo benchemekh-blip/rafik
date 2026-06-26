@@ -102,7 +102,7 @@ describe('LoginPage', () => {
       await user.click(screen.getByRole('button', { name: /log in/i }))
       expect(screen.getByText('Email is required')).toBeInTheDocument()
 
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
+      await user.type(screen.getByLabelText(/email/i), 'benchemekh@gmail.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
 
@@ -150,11 +150,11 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
+      await user.type(screen.getByLabelText(/email/i), 'benchemekh@gmail.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
-        expect(mockLoginUser).toHaveBeenCalledWith('admin@example.com', 'password123')
+        expect(mockLoginUser).toHaveBeenCalledWith('benchemekh@gmail.com', 'password123')
       })
     })
 
@@ -162,7 +162,7 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       mockLoginUser.mockImplementationOnce(() => new Promise(() => {}))
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
+      await user.type(screen.getByLabelText(/email/i), 'benchemekh@gmail.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
@@ -176,7 +176,7 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
+      await user.type(screen.getByLabelText(/email/i), 'benchemekh@gmail.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
@@ -212,7 +212,7 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
+      await user.type(screen.getByLabelText(/email/i), 'benchemekh@gmail.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
@@ -228,11 +228,11 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
       renderPage()
-      await user.type(screen.getByLabelText(/email/i), '  admin@example.com  ')
+      await user.type(screen.getByLabelText(/email/i), '  benchemekh@gmail.com  ')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       await waitFor(() => {
-        expect(mockLoginUser).toHaveBeenCalledWith('admin@example.com', 'password123')
+        expect(mockLoginUser).toHaveBeenCalledWith('benchemekh@gmail.com', 'password123')
       })
     })
 
