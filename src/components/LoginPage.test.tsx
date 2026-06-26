@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import LoginPage from './LoginPage'
@@ -7,6 +8,14 @@ import * as authModule from '../api/auth'
 vi.mock('../api/auth')
 
 const mockLoginUser = vi.mocked(authModule.loginUser)
+
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <LoginPage />
+    </MemoryRouter>
+  )
+}
 
 describe('LoginPage', () => {
   beforeEach(() => {
@@ -17,24 +26,24 @@ describe('LoginPage', () => {
 
   describe('A — Rendering', () => {
     it('A1: renders email input', () => {
-      render(<LoginPage />)
+      renderPage()
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
     })
 
     it('A2: renders password input', () => {
-      render(<LoginPage />)
+      renderPage()
       expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
     })
 
     it('A3: renders Remember Me checkbox unchecked by default', () => {
-      render(<LoginPage />)
+      renderPage()
       const checkbox = screen.getByRole('checkbox', { name: /remember me/i })
       expect(checkbox).toBeInTheDocument()
       expect(checkbox).not.toBeChecked()
     })
 
     it('A4: renders submit button labeled "Log In"', () => {
-      render(<LoginPage />)
+      renderPage()
       expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument()
     })
   })
@@ -44,14 +53,14 @@ describe('LoginPage', () => {
   describe('B — Validation', () => {
     it('B1: shows "Email is required" when submitting with empty email', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       await user.click(screen.getByRole('button', { name: /log in/i }))
       expect(screen.getByText('Email is required')).toBeInTheDocument()
     })
 
     it('B2: shows "Invalid email address" for bad email format', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'not-an-email')
       await user.type(screen.getByLabelText(/password/i), 'validpassword')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -60,7 +69,7 @@ describe('LoginPage', () => {
 
     it('B3: shows "Password is required" when submitting with empty password', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'user@example.com')
       await user.click(screen.getByRole('button', { name: /log in/i }))
       expect(screen.getByText('Password is required')).toBeInTheDocument()
@@ -68,7 +77,7 @@ describe('LoginPage', () => {
 
     it('B4: shows "Password must be at least 6 characters" for short password', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'user@example.com')
       await user.type(screen.getByLabelText(/password/i), 'abc')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -77,7 +86,7 @@ describe('LoginPage', () => {
 
     it('B5: does NOT call the API when validation fails', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       await user.click(screen.getByRole('button', { name: /log in/i }))
       expect(mockLoginUser).not.toHaveBeenCalled()
     })
@@ -85,7 +94,7 @@ describe('LoginPage', () => {
     it('B6: clears validation errors when user corrects input and resubmits', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
 
       await user.click(screen.getByRole('button', { name: /log in/i }))
       expect(screen.getByText('Email is required')).toBeInTheDocument()
@@ -105,7 +114,7 @@ describe('LoginPage', () => {
   describe('C — Interactions', () => {
     it('C1: typing in email field updates its value', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       const emailInput = screen.getByLabelText(/email/i)
       await user.type(emailInput, 'user@example.com')
       expect(emailInput).toHaveValue('user@example.com')
@@ -113,7 +122,7 @@ describe('LoginPage', () => {
 
     it('C2: typing in password field updates its value', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       const passwordInput = screen.getByLabelText(/password/i)
       await user.type(passwordInput, 'mypassword')
       expect(passwordInput).toHaveValue('mypassword')
@@ -121,7 +130,7 @@ describe('LoginPage', () => {
 
     it('C3: clicking Remember Me toggles the checkbox', async () => {
       const user = userEvent.setup()
-      render(<LoginPage />)
+      renderPage()
       const checkbox = screen.getByRole('checkbox', { name: /remember me/i })
       expect(checkbox).not.toBeChecked()
       await user.click(checkbox)
@@ -137,7 +146,7 @@ describe('LoginPage', () => {
     it('D1: calls loginUser with email and password on valid submit', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -149,7 +158,7 @@ describe('LoginPage', () => {
     it('D2: button shows "Logging in…" and is disabled while loading', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockImplementationOnce(() => new Promise(() => {}))
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -163,7 +172,7 @@ describe('LoginPage', () => {
     it('D3: shows success message on resolved API response', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -175,7 +184,7 @@ describe('LoginPage', () => {
     it('D4: shows error message on rejected API response', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockRejectedValueOnce(new Error('Invalid credentials'))
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'wrong@example.com')
       await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -187,7 +196,7 @@ describe('LoginPage', () => {
     it('D5: re-enables submit button after API call resolves', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -199,7 +208,7 @@ describe('LoginPage', () => {
     it('D6: calls loginUser exactly once per submit', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'admin@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -215,7 +224,7 @@ describe('LoginPage', () => {
     it('E1: trims leading/trailing whitespace from email before API call', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockResolvedValueOnce({ token: 'mock-token' })
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), '  admin@example.com  ')
       await user.type(screen.getByLabelText(/password/i), 'password123')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -227,7 +236,7 @@ describe('LoginPage', () => {
     it('E2: hides API error message after a successful retry', async () => {
       const user = userEvent.setup()
       mockLoginUser.mockRejectedValueOnce(new Error('Invalid credentials'))
-      render(<LoginPage />)
+      renderPage()
       await user.type(screen.getByLabelText(/email/i), 'wrong@example.com')
       await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
       await user.click(screen.getByRole('button', { name: /log in/i }))
@@ -249,31 +258,31 @@ describe('LoginPage', () => {
 
   describe('F — Navigation Links', () => {
     it('F1: renders a "Forgot password?" link', () => {
-      render(<LoginPage />)
+      renderPage()
       const link = screen.getByRole('link', { name: /forgot password/i })
       expect(link).toBeInTheDocument()
     })
 
     it('F2: "Forgot password?" link has an href attribute', () => {
-      render(<LoginPage />)
+      renderPage()
       const link = screen.getByRole('link', { name: /forgot password/i })
       expect(link).toHaveAttribute('href')
     })
 
     it('F3: renders a "Sign up" link', () => {
-      render(<LoginPage />)
+      renderPage()
       const link = screen.getByRole('link', { name: /sign up/i })
       expect(link).toBeInTheDocument()
     })
 
     it('F4: "Sign up" link has an href attribute', () => {
-      render(<LoginPage />)
+      renderPage()
       const link = screen.getByRole('link', { name: /sign up/i })
       expect(link).toHaveAttribute('href')
     })
 
     it('F5: "Don\'t have an account?" prompt is visible alongside the Sign up link', () => {
-      render(<LoginPage />)
+      renderPage()
       expect(screen.getByText(/don't have an account/i)).toBeInTheDocument()
     })
   })
