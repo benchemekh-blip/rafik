@@ -126,6 +126,10 @@ export default function LoginPage() {
             {status === 'loading' ? 'Logging in…' : 'Log In'}
           </button>
         </form>
+
+        <p className={styles.signupText}>
+          Don't have an account? <a href="#" className={styles.signupLink}>Sign up</a>
+        </p>
       </div>
     </div>
   )
