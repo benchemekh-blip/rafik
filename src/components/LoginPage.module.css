@@ -57,12 +57,29 @@
   margin-bottom: 1.25rem;
 }
 
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
 .label {
   display: block;
   font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 0.4rem;
+}
+
+.forgotLink {
+  font-size: 0.8rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
 }
 
 .input {
